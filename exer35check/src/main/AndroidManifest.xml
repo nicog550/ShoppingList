@@ -12,5 +12,6 @@ android:versionName="1.0">
             <category android:name="android.intent.category.LAUNCHER"/>
         </intent-filter>
     </activity>
+    <activity android:name=".Categories" android:label="Categories"/>
 </application>
 </manifest>

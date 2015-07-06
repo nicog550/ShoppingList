@@ -1,10 +1,6 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package ltim.master;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ListActivity;
 import android.content.ContentValues;
@@ -13,27 +9,24 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 
-import db.ItemContract;
+import db.CategoriesContract;
+import db.CategoryDBHelper;
 import db.ItemDBHelper;
 
-/**
- *
- * @author mascport
- */
-public class Practica extends ListActivity
-        /*implements CompoundButton.OnCheckedChangeListener*/ {
+public class Categories extends ListActivity {
 
     private CheckBox cb;
-    private ItemDBHelper helper;
+    private CategoryDBHelper helper;
 
     @Override
     public void onCreate(Bundle icicle) {
@@ -45,35 +38,29 @@ public class Practica extends ListActivity
     }
 
     private void updateUI() {
-        helper = new ItemDBHelper(Practica.this);
-        SQLiteDatabase sqlDB = helper.getReadableDatabase();
+        helper = new CategoryDBHelper(Categories.this);
+        SQLiteDatabase sqlDB = helper.getWritableDatabase();
         helper.onCreate(sqlDB);
-        Cursor cursor = sqlDB.query(ItemContract.TABLE,
-                new String[]{ItemContract.Columns._ID, ItemContract.Columns.ITEM},
+        Cursor cursor = sqlDB.query(CategoriesContract.TABLE,
+                new String[]{CategoriesContract.Columns._ID, CategoriesContract.Columns.CATEGORY},
                 null,null,null,null,null);
 
         SimpleCursorAdapter listAdapter = new SimpleCursorAdapter(
                 this,
-                R.layout.item,
+                R.layout.category,
                 cursor,
-                new String[] {ItemContract.Columns.ITEM},
+                new String[] {CategoriesContract.Columns.CATEGORY},
                 new int[] { R.id.taskTextView},
                 0
         );
         this.setListAdapter(listAdapter);
     }
 
-    /*public void onCheckedChanged(CompoundButton but, boolean bol) {
-        if (bol) {
-            cb.setText("Picat");
-        } else {
-            cb.setText("No picat");
-        }
-    }*/
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu, menu);
+        MenuItem btn = menu.findItem(R.id.switch_activity);
+        btn.setVisible(false); //Ocultam el botó del menú
         return true;
     }
 
@@ -90,16 +77,16 @@ public class Practica extends ListActivity
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         String task = inputField.getText().toString();
-                        Log.d("MainActivity",task);
+                        Log.d("Categories",task);
 
-                        ItemDBHelper helper = new ItemDBHelper(Practica.this);
+                        CategoryDBHelper helper = new CategoryDBHelper(Categories.this);
                         SQLiteDatabase db = helper.getWritableDatabase();
                         ContentValues values = new ContentValues();
 
                         values.clear();
-                        values.put(ItemContract.Columns.ITEM,task);
+                        values.put(CategoriesContract.Columns.CATEGORY,task);
 
-                        db.insertWithOnConflict(ItemContract.TABLE, null, values,
+                        db.insertWithOnConflict(CategoriesContract.TABLE, null, values,
                                 SQLiteDatabase.CONFLICT_IGNORE);
                         updateUI();
                     }
@@ -110,7 +97,6 @@ public class Practica extends ListActivity
                 builder.create().show();
                 return true;
             case R.id.switch_activity:
-                // Canviam d'Activity
                 Intent i = new Intent(this, Categories.class);
                 startActivity(i);
                 return true;
@@ -124,20 +110,11 @@ public class Practica extends ListActivity
      * Es crida quan es pitja el botó "fet"
      * @param view
      */
-    public void onDoneButtonClick(View view) {
+    public void onViewCategoryClick(View view) {
         View v = (View) view.getParent();
         TextView taskTextView = (TextView) v.findViewById(R.id.taskTextView);
         String task = taskTextView.getText().toString();
 
-        String sql = String.format("DELETE FROM %s WHERE %s = '%s'",
-                ItemContract.TABLE,
-                ItemContract.Columns.ITEM,
-                task);
-
-        helper = new ItemDBHelper(Practica.this);
-        SQLiteDatabase sqlDB = helper.getWritableDatabase();
-        sqlDB.execSQL(sql);
-        updateUI();
+        //TODO: new Intent()
     }
-
 }

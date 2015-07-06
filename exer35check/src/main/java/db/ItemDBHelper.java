@@ -5,27 +5,27 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
-public class TaskDBHelper extends SQLiteOpenHelper {
+public class ItemDBHelper extends SQLiteOpenHelper {
 
-    public TaskDBHelper(Context context) {
-        super(context, Contract.DB_NAME, null, Contract.DB_VERSION);
+    public ItemDBHelper(Context context) {
+        super(context, ItemContract.DB_NAME, null, ItemContract.DB_VERSION);
     }
 
     @Override
     public void onCreate(SQLiteDatabase sqlDB) {
         String sqlQuery =
-                String.format("CREATE TABLE %s (" +
+                String.format("CREATE TABLE IF NOT EXISTS %s (" +
                                 "_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                                "%s TEXT)", Contract.TABLE,
-                        Contract.Columns.TASK);
+                                "%s TEXT)", ItemContract.TABLE,
+                        ItemContract.Columns.ITEM);
 
-        Log.d("TaskDBHelper","Query to form table: "+sqlQuery);
+        Log.d("ItemDBHelper","Query to form table: "+sqlQuery);
         sqlDB.execSQL(sqlQuery);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase sqlDB, int i, int i2) {
-        sqlDB.execSQL("DROP TABLE IF EXISTS "+Contract.TABLE);
+        sqlDB.execSQL("DROP TABLE IF EXISTS "+ ItemContract.TABLE);
         onCreate(sqlDB);
     }
 }
