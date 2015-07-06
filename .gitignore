@@ -1,0 +1,14 @@
+.gradle
+.idea
+build
+gradle
+build.gradle
+exer3-5-check.iml
+gradlew
+gradlew.bat
+import-summary.txt
+local.properties
+settings.gradle
+exer35check/build
+exer35check/build.gradle
+exer35check/exer35check.iml
