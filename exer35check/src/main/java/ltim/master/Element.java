@@ -48,12 +48,6 @@ public class Element extends ListActivity {
         updateElementsUI();
     }
 
-    @Override
-    protected void onStop() {
-        super.onStop();
-        cursor.close();
-    }
-
     private void updateElementsUI() {
         helper = new ElementDBHelper(Element.this);
         SQLiteDatabase sqlDB = helper.getReadableDatabase();

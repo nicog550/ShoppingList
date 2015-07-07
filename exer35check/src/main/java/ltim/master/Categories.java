@@ -34,12 +34,6 @@ public class Categories extends ListActivity {
         updateCategoriesUI();
     }
 
-    @Override
-    protected void onStop() {
-        super.onStop();
-        cursor.close();
-    }
-
     private void updateCategoriesUI() {
         helper = new CategoryDBHelper(Categories.this);
         SQLiteDatabase sqlDB = helper.getReadableDatabase();
@@ -72,8 +66,8 @@ public class Categories extends ListActivity {
         switch (item.getItemId()) {
             case R.id.action_add_task:
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                builder.setTitle("Afegir un element");
-                builder.setMessage("Introdueix el nom del nou element");
+                builder.setTitle("Afegir una categoria");
+                builder.setMessage("Introduïu el nom de la nova categoria");
                 final EditText inputField = new EditText(this);
                 builder.setView(inputField);
                 builder.setPositiveButton("Afegir", new DialogInterface.OnClickListener() {

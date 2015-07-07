@@ -36,12 +36,6 @@ public class Practica extends ListActivity {
         updateUI();
     }
 
-    @Override
-    protected void onStop() {
-        super.onStop();
-        cursor.close();
-    }
-
     public void updateUI() {
         ItemDBHelper helper = new ItemDBHelper(Practica.this);
         SQLiteDatabase sqlDB = helper.getReadableDatabase();
