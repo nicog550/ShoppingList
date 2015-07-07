@@ -1,6 +1,10 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+
 package ltim.master;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ListActivity;
 import android.content.ContentValues;
@@ -9,48 +13,50 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.util.Log;
 import android.view.View;
-import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 
-import db.CategoriesContract;
-import db.CategoryDBHelper;
-import db.ItemDBHelper;
+import db.ElementContract;
+import db.ElementDBHelper;
 
-public class Categories extends ListActivity {
 
-    private CheckBox cb;
-    private CategoryDBHelper helper;
+public class Element extends ListActivity {
+
+    private String category;
+    private ElementDBHelper helper;
 
     @Override
     public void onCreate(Bundle icicle) {
         super.onCreate(icicle);
         setContentView(R.layout.main);
-        //cb = (CheckBox) findViewById(R.id.check);
-        //cb.setOnCheckedChangeListener(this);
+        Intent intent = getIntent();
+        category = intent.getStringExtra("category");
+        setTitle(category);
         updateUI();
     }
 
     private void updateUI() {
-        helper = new CategoryDBHelper(Categories.this);
+        helper = new ElementDBHelper(Element.this);
         SQLiteDatabase sqlDB = helper.getReadableDatabase();
         helper.onCreate(sqlDB);
-        Cursor cursor = sqlDB.query(CategoriesContract.TABLE,
-                new String[]{CategoriesContract.Columns._ID, CategoriesContract.Columns.CATEGORY},
-                null,null,null,null,null);
+        Cursor cursor = sqlDB.query(
+                ElementContract.TABLE,
+                new String[]{ElementContract.Columns._ID, ElementContract.Columns.ITEM,
+                        ElementContract.Columns.IMAGE},
+                ElementContract.Columns.CATEGORY + " = ?", new String[] {category},null,null,null);
 
         SimpleCursorAdapter listAdapter = new SimpleCursorAdapter(
                 this,
-                R.layout.category,
+                R.layout.element,
                 cursor,
-                new String[] {CategoriesContract.Columns.CATEGORY},
-                new int[] { R.id.categoryView},
+                new String[] {ElementContract.Columns.ITEM, ElementContract.Columns.IMAGE},
+                new int[] {R.id.elementTextView},
                 0
         );
         this.setListAdapter(listAdapter);
@@ -76,17 +82,19 @@ public class Categories extends ListActivity {
                 builder.setPositiveButton("Afegir", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        String cat = inputField.getText().toString();
-                        Log.d("Categories",cat);
+                        String elem = inputField.getText().toString();
+                        Log.d("MainActivity",elem);
 
-                        CategoryDBHelper helper = new CategoryDBHelper(Categories.this);
+                        ElementDBHelper helper = new ElementDBHelper(Element.this);
                         SQLiteDatabase db = helper.getWritableDatabase();
                         ContentValues values = new ContentValues();
 
                         values.clear();
-                        values.put(CategoriesContract.Columns.CATEGORY, cat);
+                        values.put(ElementContract.Columns.ITEM, elem);
+                        values.put(ElementContract.Columns.CATEGORY, category);
+                        values.put(ElementContract.Columns.IMAGE, "");
 
-                        db.insertWithOnConflict(CategoriesContract.TABLE, null, values,
+                        db.insertWithOnConflict(ElementContract.TABLE, null, values,
                                 SQLiteDatabase.CONFLICT_IGNORE);
                         updateUI();
                     }
@@ -95,10 +103,6 @@ public class Categories extends ListActivity {
                 builder.setNegativeButton("Cancelar",null);
 
                 builder.create().show();
-                return true;
-            case R.id.switch_activity:
-                Intent i = new Intent(this, Categories.class);
-                startActivity(i);
                 return true;
 
             default:
@@ -110,12 +114,20 @@ public class Categories extends ListActivity {
      * Es crida quan es pitja el botó "fet"
      * @param view
      */
-    public void onViewCategoryClick(View view) {
+    public void onDoneButtonClick(View view) {
         View v = (View) view.getParent();
-        TextView taskTextView = (TextView) v.findViewById(R.id.categoryView);
-        String cat = taskTextView.getText().toString();
-        Intent intent = new Intent(this, Element.class);
-        intent.putExtra("category", cat);
-        startActivity(intent);
+        TextView taskTextView = (TextView) v.findViewById(R.id.taskTextView);
+        String task = taskTextView.getText().toString();
+
+        String sql = String.format("DELETE FROM %s WHERE %s = '%s'",
+                ElementContract.TABLE,
+                ElementContract.Columns.ITEM,
+                task);
+
+        helper = new ElementDBHelper(Element.this);
+        SQLiteDatabase sqlDB = helper.getWritableDatabase();
+        sqlDB.execSQL(sql);
+        updateUI();
     }
+
 }

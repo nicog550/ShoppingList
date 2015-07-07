@@ -1,17 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-package="ltim.master"
-android:versionCode="1"
-android:versionName="1.0">
-<uses-sdk android:minSdkVersion="11" android:targetSdkVersion="19"/>
-<application android:label="@string/app_name">
-    <activity android:name=".Practica"
-        android:label="Llista de la compra">
-        <intent-filter>
-            <action android:name="android.intent.action.MAIN"/>
-            <category android:name="android.intent.category.LAUNCHER"/>
-        </intent-filter>
-    </activity>
-    <activity android:name=".Categories" android:label="Categories"/>
-</application>
+    package="ltim.master"
+    android:versionCode="1"
+    android:versionName="1.0" >
+
+    <uses-sdk
+        android:minSdkVersion="11"
+        android:targetSdkVersion="19" />
+
+    <android:uses-permission
+        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:maxSdkVersion="18" />
+    <android:uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <android:uses-permission
+        android:name="android.permission.READ_EXTERNAL_STORAGE"
+        android:maxSdkVersion="18" />
+
+    <application android:label="@string/app_name" >
+        <activity
+            android:name=".Practica"
+            android:label="Llista de la compra" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".Categories"
+            android:label="Categories" />
+        <activity
+            android:name=".Element"
+            android:label="" >
+        </activity>
+    </application>
+
 </manifest>
