@@ -1,8 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package ltim.master;
 
 import android.app.AlertDialog;
@@ -15,37 +10,32 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.util.Log;
 import android.view.View;
-import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import db.ItemContract;
 import db.ItemDBHelper;
 
-/**
- *
- * @author mascport
- */
-public class Practica extends ListActivity
-        /*implements CompoundButton.OnCheckedChangeListener*/ {
-
-    private CheckBox cb;
-    private ItemDBHelper helper;
+public class Practica extends ListActivity {
 
     @Override
     public void onCreate(Bundle icicle) {
         super.onCreate(icicle);
         setContentView(R.layout.main);
-        //cb = (CheckBox) findViewById(R.id.check);
-        //cb.setOnCheckedChangeListener(this);
         updateUI();
     }
 
-    private void updateUI() {
-        helper = new ItemDBHelper(Practica.this);
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        updateUI();
+    }
+
+    public void updateUI() {
+        ItemDBHelper helper = new ItemDBHelper(Practica.this);
         SQLiteDatabase sqlDB = helper.getReadableDatabase();
         helper.onCreate(sqlDB);
         Cursor cursor = sqlDB.query(ItemContract.TABLE,
@@ -63,17 +53,11 @@ public class Practica extends ListActivity
         this.setListAdapter(listAdapter);
     }
 
-    /*public void onCheckedChanged(CompoundButton but, boolean bol) {
-        if (bol) {
-            cb.setText("Picat");
-        } else {
-            cb.setText("No picat");
-        }
-    }*/
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu, menu);
+        MenuItem btn = menu.findItem(R.id.action_add_task);
+        btn.setVisible(false); //Ocultam el botó del menú
         return true;
     }
 
@@ -90,7 +74,6 @@ public class Practica extends ListActivity
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         String task = inputField.getText().toString();
-                        Log.d("MainActivity",task);
 
                         ItemDBHelper helper = new ItemDBHelper(Practica.this);
                         SQLiteDatabase db = helper.getWritableDatabase();
@@ -134,9 +117,11 @@ public class Practica extends ListActivity
                 ItemContract.Columns.ITEM,
                 task);
 
-        helper = new ItemDBHelper(Practica.this);
+        ItemDBHelper helper = new ItemDBHelper(Practica.this);
         SQLiteDatabase sqlDB = helper.getWritableDatabase();
         sqlDB.execSQL(sql);
+        String msg = "L'element \"" + task + "\" ha estat marcat com a \"comprat\"";
+        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
         updateUI();
     }
 

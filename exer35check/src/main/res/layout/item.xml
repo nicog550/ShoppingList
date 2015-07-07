@@ -12,17 +12,21 @@
         android:id="@+id/taskTextView"
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
+        android:layout_marginLeft="10dp"
         android:textSize="20dp"
         android:layout_toLeftOf="@+id/doneButton"
         android:layout_alignBottom="@+id/doneButton"
         android:gravity="center_vertical" />
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Fet"
+    <ImageButton
         android:id="@+id/doneButton"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
         android:layout_alignParentTop="true"
         android:layout_alignParentRight="true"
-        android:onClick="onDoneButtonClick"/>
+        android:layout_marginBottom="5dp"
+        android:layout_marginTop="5dp"
+        android:onClick="onDoneButtonClick"
+        android:background="@android:color/transparent"
+        android:src="@android:drawable/ic_menu_set_as"/>
 </RelativeLayout>

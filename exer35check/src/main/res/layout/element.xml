@@ -5,7 +5,7 @@
     android:layout_height="fill_parent"
     xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <ImageView
+    <ImageButton
         android:id="@+id/imageView"
         android:layout_width="60dp"
         android:layout_height="60dp"
@@ -13,7 +13,8 @@
         android:layout_alignParentLeft="true"
         android:layout_marginBottom="5dp"
         android:layout_marginTop="5dp"
-        android:onClick="onDoneButtonClick"
+        android:onClick="onSetImageClick"
+        android:background="@android:color/transparent"
         android:src="@android:drawable/ic_menu_report_image"/>
 
     <TextView
@@ -25,4 +26,16 @@
         android:layout_marginLeft="65dp"
         android:layout_marginTop="20dp"
         android:textSize="20dp" />
+
+    <ImageButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@android:color/transparent"
+        android:src="@android:drawable/ic_menu_add"
+        android:id="@+id/addToCartButton"
+        android:onClick="onAddToCartClick"
+        android:layout_marginTop="15dp"
+        android:layout_marginRight="15dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"/>
 </RelativeLayout>

@@ -1,6 +1,5 @@
 package ltim.master;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ListActivity;
 import android.content.ContentValues;
@@ -13,7 +12,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.SimpleCursorAdapter;
@@ -21,23 +19,19 @@ import android.widget.TextView;
 
 import db.CategoriesContract;
 import db.CategoryDBHelper;
-import db.ItemDBHelper;
 
 public class Categories extends ListActivity {
 
-    private CheckBox cb;
     private CategoryDBHelper helper;
 
     @Override
     public void onCreate(Bundle icicle) {
         super.onCreate(icicle);
         setContentView(R.layout.main);
-        //cb = (CheckBox) findViewById(R.id.check);
-        //cb.setOnCheckedChangeListener(this);
-        updateUI();
+        updateCategoriesUI();
     }
 
-    private void updateUI() {
+    private void updateCategoriesUI() {
         helper = new CategoryDBHelper(Categories.this);
         SQLiteDatabase sqlDB = helper.getReadableDatabase();
         helper.onCreate(sqlDB);
@@ -77,7 +71,6 @@ public class Categories extends ListActivity {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         String cat = inputField.getText().toString();
-                        Log.d("Categories",cat);
 
                         CategoryDBHelper helper = new CategoryDBHelper(Categories.this);
                         SQLiteDatabase db = helper.getWritableDatabase();
@@ -88,7 +81,7 @@ public class Categories extends ListActivity {
 
                         db.insertWithOnConflict(CategoriesContract.TABLE, null, values,
                                 SQLiteDatabase.CONFLICT_IGNORE);
-                        updateUI();
+                        updateCategoriesUI();
                     }
                 });
 
@@ -107,7 +100,7 @@ public class Categories extends ListActivity {
     }
 
     /**
-     * Es crida quan es pitja el botó "fet"
+     * Es crida quan es pitja sobre una categoria
      * @param view
      */
     public void onViewCategoryClick(View view) {
