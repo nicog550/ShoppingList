@@ -24,15 +24,19 @@
         android:layout_height="wrap_content"
         android:background="@android:color/transparent"
         android:id="@+id/newItemButton"
+        android:layout_marginRight="50dp"
         android:onClick="onViewCategoryClick"/>
 
-    <!--<ImageButton
+    <ImageButton
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@android:drawable/ic_menu_delete"
         android:background="@android:color/transparent"
         android:id="@+id/deleteButton"
         android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="10dp"
+        android:layout_marginTop="10dp"
         android:layout_toLeftOf="@+id/newItemButton"
-        android:onClick="confirmRemovalClick"/>-->
+        android:onClick="confirmRemovalClick"/>
 </RelativeLayout>
