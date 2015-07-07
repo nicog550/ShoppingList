@@ -132,7 +132,9 @@ public class Categories extends ListActivity {
         final Activity currentActivity = this;
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Eliminar una categoria");
-        builder.setMessage("Segur que voleu eliminar \"" + cat + "\" i tots els seus elements?");
+        String msg = String.format(
+                "Segur que voleu eliminar la categoria \"%s\" i tots els seus elements?", cat);
+        builder.setMessage(msg);
         builder.setPositiveButton("Confirmar", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {

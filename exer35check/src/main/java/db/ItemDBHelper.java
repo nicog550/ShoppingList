@@ -16,8 +16,9 @@ public class ItemDBHelper extends SQLiteOpenHelper {
         String sqlQuery =
                 String.format("CREATE TABLE IF NOT EXISTS %s (" +
                                 "_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                                "%s TEXT" +
                                 "%s TEXT)", ItemContract.TABLE,
-                        ItemContract.Columns.ITEM);
+                        ItemContract.Columns.ITEM, ItemContract.Columns.IMAGE);
 
         sqlDB.execSQL(sqlQuery);
     }

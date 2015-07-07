@@ -47,15 +47,16 @@ public class Practica extends ListActivity {
         SQLiteDatabase sqlDB = helper.getReadableDatabase();
         helper.onCreate(sqlDB);
         cursor = sqlDB.query(ItemContract.TABLE,
-                new String[]{ItemContract.Columns._ID, ItemContract.Columns.ITEM},
+                new String[]{ItemContract.Columns._ID, ItemContract.Columns.ITEM,
+                             ItemContract.Columns.IMAGE},
                 null,null,null,null,null);
 
         SimpleCursorAdapter listAdapter = new SimpleCursorAdapter(
                 this,
                 R.layout.item,
                 cursor,
-                new String[] {ItemContract.Columns.ITEM},
-                new int[] { R.id.taskTextView},
+                new String[] {ItemContract.Columns.ITEM, ItemContract.Columns.IMAGE},
+                new int[] {R.id.taskTextView, R.id.productImage},
                 0
         );
         this.setListAdapter(listAdapter);

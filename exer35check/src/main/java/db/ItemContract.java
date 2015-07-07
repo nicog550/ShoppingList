@@ -9,6 +9,7 @@ public class ItemContract {
 
     public class Columns {
         public static final String ITEM = "task";
+        public static final String IMAGE = "image";
         public static final String _ID = BaseColumns._ID;
     }
 }

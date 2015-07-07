@@ -4,21 +4,18 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ListActivity;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.res.Resources;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.drawable.BitmapDrawable;
-import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
+import android.provider.MediaStore;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -26,14 +23,6 @@ import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-
-import db.CategoriesContract;
 import db.ElementContract;
 import db.ElementDBHelper;
 import db.ItemContract;
@@ -45,9 +34,9 @@ public class Element extends ListActivity {
     private String category;
     private ElementDBHelper helper;
     private Cursor cursor;
-    private ImageButton taskTextView;
+    private ImageButton elementImage;
     private final int REQUEST_CODE_PICK_FILE = 1;
-    private final String FOLDER = "llistaDeCompra";
+    private String imageTag;
 
     @Override
     public void onCreate(Bundle icicle) {
@@ -79,8 +68,10 @@ public class Element extends ListActivity {
                 this,
                 R.layout.element,
                 cursor,
-                new String[] {ElementContract.Columns.ITEM, ElementContract.Columns.IMAGE},
-                new int[] {R.id.elementTextView},
+                new String[] {
+                        ElementContract.Columns.ITEM,
+                        ElementContract.Columns.IMAGE},
+                new int[] {R.id.elementTextView, R.id.imageView},
                 0
         );
         this.setListAdapter(listAdapter);
@@ -141,9 +132,10 @@ public class Element extends ListActivity {
         View v = (View) view.getParent().getParent();
         TextView tv = (TextView)v.findViewById(R.id.elementTextView);
         final String name = tv.getText().toString();
+        final String img = getImage(name);
         final Activity currentActivity = this;
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Afegir " + name + " a la llista");
+        builder.setTitle("Afegir \"" + name + "\" a la llista");
         builder.setMessage("Introdueix la quantitat");
         final EditText inputField = new EditText(this);
         builder.setView(inputField);
@@ -161,6 +153,7 @@ public class Element extends ListActivity {
 
                 values.clear();
                 values.put(ItemContract.Columns.ITEM, toBeInserted);
+                values.put(ItemContract.Columns.IMAGE, img);
 
                 db.insertWithOnConflict(ItemContract.TABLE, null, values,
                         SQLiteDatabase.CONFLICT_IGNORE);
@@ -170,6 +163,15 @@ public class Element extends ListActivity {
         builder.setNegativeButton("Cancelar",null);
 
         builder.create().show();
+    }
+
+    private String getImage(String name) {
+        SQLiteDatabase sqlDB = helper.getReadableDatabase();
+        cursor = sqlDB.query(ElementContract.TABLE,
+                new String[]{ElementContract.Columns.IMAGE},
+                ElementContract.Columns.ITEM + " = ?", new String[] {name},null,null,null);
+        cursor.moveToFirst();
+        return cursor.getString(0);
     }
 
     /**
@@ -213,34 +215,44 @@ public class Element extends ListActivity {
      */
     public void onSetImageClick(View view) {
         View v = (View) view.getParent();
-        taskTextView = (ImageButton)v.findViewById(R.id.imageView);
-        /*final Context activityForButton = this;
-        Log.d(LOGTAG, "Hiya");
-        Intent fileExploreIntent = new Intent(
-                FileBrowserActivity.INTENT_ACTION_SELECT_DIR,
-                null,
-                activityForButton,
-                FileBrowserActivity.class
-        );
-        //If the parameter below is not provided the Activity will try to start from sdcard(external storage),
-        // if fails, then will start from roor "/"
-        // Do not use "/sdcard" instead as base address for sdcard use Environment.getExternalStorageDirectory()
-//        		fileExploreIntent.putExtra(
-//        				ua.com.vassiliev.androidfilebrowser.FileBrowserActivity.startDirectoryParameter,
-//        				"/sdcard"
-//        				);
-        Log.d(LOGTAG, "Hiya 2");
-        startActivityForResult(
-                fileExploreIntent,
-                REQUEST_CODE_PICK_DIR
-        );*/
+        elementImage = (ImageButton)v.findViewById(R.id.imageButton);
+        TextView taskTextView = (TextView) v.findViewById(R.id.elementTextView);
+        imageTag = taskTextView.getText().toString();
         Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
         photoPickerIntent.setType("image/*");
         startActivityForResult(photoPickerIntent, REQUEST_CODE_PICK_FILE);
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent imageReturnedIntent) {
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_CODE_PICK_FILE && resultCode == RESULT_OK && null != data) {
+            Uri selectedImage = data.getData();
+            String[] filePathColumn = { MediaStore.Images.Media.DATA };
+            Cursor cursor = getContentResolver().query(selectedImage,filePathColumn, null, null, null);
+            cursor.moveToFirst();
+            int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+            String picturePath = cursor.getString(columnIndex);
+            cursor.close();
+            ImageButton imageView = elementImage;
+            imageView.setImageBitmap(BitmapFactory.decodeFile(picturePath));
+            storeImg(picturePath);
+        }
+    }
+
+    private void storeImg(String path) {
+        ElementDBHelper helper = new ElementDBHelper(Element.this);
+        SQLiteDatabase db = helper.getWritableDatabase();
+
+        // Actualitzam el producte amb la nova imatge
+        ContentValues cv = new ContentValues();
+        cv.put(ElementContract.Columns.IMAGE, path);
+        db.update(ElementContract.TABLE,
+                cv,
+                ElementContract.Columns.ITEM + "= ?",
+                new String[]{imageTag});
+    }
+    /*protected void onActivityResult(int requestCode, int resultCode, Intent imageReturnedIntent) {
         super.onActivityResult(requestCode, resultCode, imageReturnedIntent);
 
         switch(requestCode) {
@@ -264,45 +276,11 @@ public class Element extends ListActivity {
                         Resources res = getResources();
                         Bitmap bitmap = BitmapFactory.decodeFile("//media/external/images/media/22441");
                         BitmapDrawable bd = new BitmapDrawable(res, bitmap);
-                        taskTextView.setBackgroundDrawable(bd);
+                        elementImage.setBackgroundDrawable(bd);
                     } catch (FileNotFoundException fe) {
                             Log.w("Log", "Not found");
                     }
                 }
         }
-    }
-
-    private void storeImg(InputStream is, String name) {
-        File path = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-        File file = new File(path, name);
-
-        try {
-            // Very simple code to copy a picture from the application's
-            // resource into the external file.  Note that this code does
-            // no error checking, and assumes the picture is small (does not
-            // try to copy it in chunks).  Note that if external storage is
-            // not currently mounted this will silently fail.
-            OutputStream os = new FileOutputStream(file);
-            byte[] data = new byte[is.available()];
-            is.read(data);
-            os.write(data);
-            is.close();
-            os.close();
-
-            // Tell the media scanner about the new file so that it is
-            // immediately available to the user.
-            MediaScannerConnection.scanFile(this,
-                    new String[] { file.toString() }, null,
-                    new MediaScannerConnection.OnScanCompletedListener() {
-                        public void onScanCompleted(String path, Uri uri) {
-                            Log.i("ExternalStorage", "Scanned " + path + ":");
-                            Log.i("ExternalStorage", "-> uri=" + uri);
-                        }
-                    });
-        } catch (IOException e) {
-            // Unable to create file, likely because external storage is
-            // not currently mounted.
-            Log.w("ExternalStorage", "Error writing " + file, e);
-        }
-    }
+    }*/
 }
