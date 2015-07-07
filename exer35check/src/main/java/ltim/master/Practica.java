@@ -21,6 +21,8 @@ import db.ItemDBHelper;
 
 public class Practica extends ListActivity {
 
+    private Cursor cursor;
+
     @Override
     public void onCreate(Bundle icicle) {
         super.onCreate(icicle);
@@ -34,11 +36,17 @@ public class Practica extends ListActivity {
         updateUI();
     }
 
+    @Override
+    protected void onStop() {
+        super.onStop();
+        cursor.close();
+    }
+
     public void updateUI() {
         ItemDBHelper helper = new ItemDBHelper(Practica.this);
         SQLiteDatabase sqlDB = helper.getReadableDatabase();
         helper.onCreate(sqlDB);
-        Cursor cursor = sqlDB.query(ItemContract.TABLE,
+        cursor = sqlDB.query(ItemContract.TABLE,
                 new String[]{ItemContract.Columns._ID, ItemContract.Columns.ITEM},
                 null,null,null,null,null);
 

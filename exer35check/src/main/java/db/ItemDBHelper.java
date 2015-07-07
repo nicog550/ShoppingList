@@ -19,7 +19,6 @@ public class ItemDBHelper extends SQLiteOpenHelper {
                                 "%s TEXT)", ItemContract.TABLE,
                         ItemContract.Columns.ITEM);
 
-        Log.d("ItemDBHelper","Query to form table: "+sqlQuery);
         sqlDB.execSQL(sqlQuery);
     }
 

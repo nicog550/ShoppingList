@@ -21,12 +21,11 @@ import db.CategoriesContract;
 import db.CategoryDBHelper;
 import db.ElementContract;
 import db.ElementDBHelper;
-import db.ItemContract;
-import db.ItemDBHelper;
 
 public class Categories extends ListActivity {
 
     private CategoryDBHelper helper;
+    private Cursor cursor;
 
     @Override
     public void onCreate(Bundle icicle) {
@@ -35,11 +34,17 @@ public class Categories extends ListActivity {
         updateCategoriesUI();
     }
 
+    @Override
+    protected void onStop() {
+        super.onStop();
+        cursor.close();
+    }
+
     private void updateCategoriesUI() {
         helper = new CategoryDBHelper(Categories.this);
         SQLiteDatabase sqlDB = helper.getReadableDatabase();
         helper.onCreate(sqlDB);
-        Cursor cursor = sqlDB.query(CategoriesContract.TABLE,
+        cursor = sqlDB.query(CategoriesContract.TABLE,
                 new String[]{CategoriesContract.Columns._ID, CategoriesContract.Columns.CATEGORY},
                 null,null,null,null,null);
 
@@ -127,7 +132,7 @@ public class Categories extends ListActivity {
         final Activity currentActivity = this;
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Eliminar una categoria");
-        builder.setMessage("Segur que voleu eliminar " + cat + "?");
+        builder.setMessage("Segur que voleu eliminar \"" + cat + "\" i tots els seus elements?");
         builder.setPositiveButton("Confirmar", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
@@ -145,7 +150,7 @@ public class Categories extends ListActivity {
                         CategoriesContract.Columns.CATEGORY + "= ?",
                         new String[]{cat});
 
-                String msg = "S'ha eliminat la categoria " + cat;
+                String msg = "S'ha eliminat la categoria \"" + cat + "\"";
                 Toast.makeText(currentActivity, msg, Toast.LENGTH_SHORT).show();
                 updateCategoriesUI();
             }

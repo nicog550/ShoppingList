@@ -19,7 +19,6 @@ public class CategoryDBHelper extends SQLiteOpenHelper {
                                 "%s TEXT)", CategoriesContract.TABLE,
                         CategoriesContract.Columns.CATEGORY);
 
-        Log.d("CategoryDBHelper","Query to form table: "+sqlQuery);
         sqlDB.execSQL(sqlQuery);
     }
 

@@ -33,6 +33,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import db.CategoriesContract;
 import db.ElementContract;
 import db.ElementDBHelper;
 import db.ItemContract;
@@ -43,6 +44,7 @@ public class Element extends ListActivity {
 
     private String category;
     private ElementDBHelper helper;
+    private Cursor cursor;
     private ImageButton taskTextView;
     private final int REQUEST_CODE_PICK_FILE = 1;
     private final String FOLDER = "llistaDeCompra";
@@ -57,11 +59,17 @@ public class Element extends ListActivity {
         updateElementsUI();
     }
 
+    @Override
+    protected void onStop() {
+        super.onStop();
+        cursor.close();
+    }
+
     private void updateElementsUI() {
         helper = new ElementDBHelper(Element.this);
         SQLiteDatabase sqlDB = helper.getReadableDatabase();
         helper.onCreate(sqlDB);
-        Cursor cursor = sqlDB.query(
+        cursor = sqlDB.query(
                 ElementContract.TABLE,
                 new String[]{ElementContract.Columns._ID, ElementContract.Columns.ITEM,
                         ElementContract.Columns.IMAGE},
@@ -130,7 +138,7 @@ public class Element extends ListActivity {
      * @param view
      */
     public void onAddToCartClick(View view) {
-        View v = (View) view.getParent();
+        View v = (View) view.getParent().getParent();
         TextView tv = (TextView)v.findViewById(R.id.elementTextView);
         final String name = tv.getText().toString();
         final Activity currentActivity = this;
@@ -156,6 +164,41 @@ public class Element extends ListActivity {
 
                 db.insertWithOnConflict(ItemContract.TABLE, null, values,
                         SQLiteDatabase.CONFLICT_IGNORE);
+            }
+        });
+
+        builder.setNegativeButton("Cancelar",null);
+
+        builder.create().show();
+    }
+
+    /**
+     * Es crida quan es pitja sobre el botó d'esborrar
+     * @param view
+     */
+    public void confirmRemovalClick(View view) {
+        View v = (View) view.getParent().getParent();
+        TextView taskTextView = (TextView) v.findViewById(R.id.elementTextView);
+        final String elem = taskTextView.getText().toString();
+        final Activity currentActivity = this;
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Eliminar un element");
+        builder.setMessage("Segur que voleu eliminar \"" + elem + "\"?");
+        builder.setPositiveButton("Confirmar", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+
+                ElementDBHelper helper = new ElementDBHelper(Element.this);
+                SQLiteDatabase db = helper.getWritableDatabase();
+
+                // Eliminam els elements de la categoria
+                db.delete(ElementContract.TABLE,
+                        ElementContract.Columns.ITEM + "= ?",
+                        new String[]{elem});
+
+                String msg = "S'ha eliminat l'element \"" + elem + "\"";
+                Toast.makeText(currentActivity, msg, Toast.LENGTH_SHORT).show();
+                updateElementsUI();
             }
         });
 

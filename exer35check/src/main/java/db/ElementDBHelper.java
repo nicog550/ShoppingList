@@ -21,7 +21,6 @@ public class ElementDBHelper extends SQLiteOpenHelper {
                                 "%s TEXT)", ElementContract.TABLE, ElementContract.Columns.ITEM,
                         ElementContract.Columns.CATEGORY, ElementContract.Columns.IMAGE);
 
-        Log.d("ElementDBHelper","Query to form table: "+sqlQuery);
         sqlDB.execSQL(sqlQuery);
     }
 
